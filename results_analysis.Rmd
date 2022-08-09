@@ -10,7 +10,8 @@ output: html_document
 ```{r}
 # Load packages
 packages <- c("tidyverse", "ggplot2", 
-              "ggthemes", "stringi")
+              "ggthemes", "stringi",
+              "tools")
 suppressMessages(invisible(lapply(packages, library, character.only=TRUE)))
 
 # Suppress summarise info
@@ -19,10 +20,12 @@ options(dplyr.summarise.inform = FALSE)
 
 ```{r}
 # Read in data
-data <- read.csv("predicted_diffs-ols.csv")
+data <- read.csv("predicted_diffs-processed.csv")
 # Tidy up factor labels for plotting
-old_factor_labels <- c('Idaci', 'Eal', 'Fsm', 'Sen', "Centretypedesc")
-new_factor_labels <- c('IDACI', 'EAL', 'FSM', "SEN", "Centre Type")
+old_factor_labels <- c('Attainment Quantile', 'Eal', 'Fsm', 'Sen',
+                       "Centretypedesc", "Idaci Quantile")
+new_factor_labels <- c('Prior Attainment', 'EAL', 'FSM', "SEN",
+                       "Centre Type", "IDACI")
 data$factor <- stri_replace_all_regex(data$factor,
                                       pattern = c('_', "X"),
                                       replacement = c(" ", " X\n"),
@@ -33,6 +36,8 @@ data$factor <- stri_replace_all_regex(data$factor,
                          vectorize=FALSE)
 # Tidying up factor value labels for plotting
 data$factor_value <- data$factor_value %>% toTitleCase()
+# Create interaction order col for easier filtering
+data$interactions <- str_count(data$factor, pattern = "X\n") + 1
 ```
 
 
@@ -42,7 +47,7 @@ my_theme <- theme_economist() +
   theme(axis.text.x = element_text(vjust = 2),
           axis.text.y = element_text(hjust = 1.2),
           axis.title = element_text(face = "bold"),
-          plot.title = element_text(vjust = 3, hjust = 0.5),
+          plot.title = element_text(vjust = 3, hjust = 0.3),
           legend.title = element_text(face = "bold"),
           legend.text = element_text(size = 10),
           legend.position = "bottom",
@@ -54,54 +59,198 @@ table_cols <- c("factor", "factor_value", "cag_diff",
                 "welch.p_val")
 ```
 
+
+```{r}
+# Create a function to help decide which interactions to report on
+# It compares the min and max CAG diff in each factor/grouping variable
+# calculates the range, then returns those ranges sorted
+calc_range_interaction <- function(df, n_interactions){
+  n_way_df <- df %>% filter(interactions == n_interactions) %>% 
+    select(factor) %>%
+    unique()
+  n_way_df <- df %>% filter(factor %in% n_way_df$factor)
+  n_way_df <- n_way_df %>% group_by(factor) %>%
+    summarise(max_val = max(cag_diff),
+              min_val = min(cag_diff)) %>% 
+    mutate(range = max_val - min_val) %>% arrange(desc(range))
+  
+  return(n_way_df)
+}
+```
+
+```{r}
+# Create a function for getting df into output format for Word tables
+tidy_table <- function(df, table_cols){
+  # Write <0.001 for pvals, else round to 3dp
+  df$welch.p_val <- ifelse(df$welch.p_val < 0.001, 
+                                "<0.001", 
+                                round(df$welch.p_val, 4))
+  # Write ethnicity more neatly
+  rep_str = c('WHIT'='White','BLAC'='Black',
+            'ASIA'='Asian', "CHIN"="Chinese",
+            "MIXD" = "Mixed")
+  df$factor_value <- str_replace_all(df$factor_value, rep_str)
+  # Write factor more neatly
+  df$factor <- df$factor %>% str_replace_all(rep_str <- c("X\n"="X "))
+  # Save number results as table in same order as graph
+  df <- df[order(nrow(df):1), ] %>% select(table_cols) %>% 
+    # Round the remaining columns
+    mutate_if(is.numeric, round, 3)
+  return(df)
+}
+```
+
 # Main Effects
+
 ```{r}
 # Filter to only the relevant main effects
-main_factors <- c("IDACI Quantile", "FSM", "EAL",
+main_factors <- c("IDACI", "FSM", "EAL",
                   "Ethnicity", "Gender", "SEN") %>% sort()
-main_effects <- data %>% filter(factor %in% main_factors)
 # Go through main results, sorting by cag_diff within each group
 main_df <- data.frame()
 for (factor_var in main_factors){
-  subdf <- main_effects %>% filter(factor == factor_var)
+  subdf <- data %>% filter(factor == factor_var)
   subdf <- subdf[order(subdf$cag_diff, decreasing = TRUE), ]
   main_df <- rbind(main_df, subdf)
 }
 # Make factor values a factor, so they are ordered in plot
 main_df$factor_value  <- factor(main_df$factor_value,
-                                     levels = (main_df$factor_value))
+                                     levels = unique(main_df$factor_value))
 # Plot main effects
 plot <- ggplot(data = main_df, mapping = aes(x = cag_diff,
                                                y = factor_value,
                                                color = factor,
                                                shape = factor)) +
-    geom_point(size = 3) + 
-    ggtitle("Average Treatment Effects | Main Effects") + 
+  # Add points
+  geom_point(size = 3) + 
+  # Add titles and labels
+  ggtitle("Average Treatment Effects") +
   xlab("Average Treatment Effect") + ylab("Category Value") +
+  # Retitle legend
   labs(color='Category') + labs(shape='Category') +
+  # Adjust theme
   my_theme
 
 # Get plot build in order to access the colours used
 plot_build <- ggplot_build(plot)
 # Add the plot colours to the yticks
-plot <- plot + theme(axis.text.y = element_text(color = plot_build$data[[1]]$colour))
+plot <- plot + 
+  theme(axis.text.y = element_text(color = plot_build$data[[1]]$colour))
 # Save plot
 ggsave("main_effects/main_effects.png", plot)
-# Tidy up results for table format
-# Write <0.001 for pvals, else round to 3dp
-main_df$welch.p_val <- ifelse(main_df$welch.p_val < 0.001, 
-                              "<0.001", 
-                              round(main_df$welch.p_val, 3))
-# Save number results as table in same order as graph
-main_df[order(nrow(main_df):1), ] %>% select(table_cols) %>% 
-  # Round the remaining columns
-  mutate_if(is.numeric, round, 3) %>% 
-  write.csv("main_effects/main_table.csv",
-            row.names = FALSE)
 plot
 ```
 
+
+Also redo the df to include prior attainment in the table
 ```{r}
-main_df
+# Filter to only the relevant main effects
+main_factors <- c("IDACI", "FSM", "EAL", "Prior Attainment",
+                  "Ethnicity", "Gender", "SEN") %>% sort()
+# Go through main results, sorting by cag_diff within each group
+main_df <- data.frame()
+for (factor_var in main_factors){
+  subdf <- data %>% filter(factor == factor_var)
+  subdf <- subdf[order(subdf$cag_diff, decreasing = TRUE), ]
+  main_df <- rbind(main_df, subdf)
+}
+
+# Tidy up results for table format
+main_df %>% tidy_table(table_cols) %>% 
+  write.csv("main_effects/main_table.csv",
+            row.names = FALSE)
 ```
+
+# Two-Way Interactions
+
+```{r}
+# Find the 2 way interactions that have greatest differences between max and min
+calc_range_interaction(data, n_interactions = 2) %>% head(10)
+```
+
+
+```{r}
+# Get all the required two-way variables
+two_way_vars <- data %>% filter(grepl("X\n", factor)) %>% 
+  filter(interactions == 1) %>% select(factor) %>% unique()
+
+two_way_vars <- c("Ethnicity X\nIDACI", "Ethnicity X\nPrior Attainment",
+                  "IDACI X\nPrior Attainment", "EAL X\nIDACI")
+two_way_vars <- two_way_vars %>% sort()
+
+# Go through main results, sorting by cag_diff within each group
+two_df <- data.frame()
+for (factor_var in two_way_vars){
+  subdf <- data %>% filter(factor == factor_var)
+  subdf <- subdf[order(subdf$cag_diff, decreasing = TRUE), ]
+  two_df <- rbind(two_df, subdf)
+}
+two_df
+
+```
+
+# Three-Way Interactions
+
+```{r}
+# Find the 3 way interactions that have greatest differences between max and min
+calc_range_interaction(data, n_interactions = 3)
+```
+
+# Four-Way Interactions
+
+```{r}
+# Find the 4 way interactions that have greatest differences between max and min
+calc_range_interaction(data, n_interactions = 4)
+```
+
+```{r}
+# Ethnicity X IDACI X Prior Attainment X EAL
+# Filter data and sort by CAG diff
+four_way_df <- data %>% filter(factor == "Ethnicity X\nIDACI X\nPrior Attainment X\nEAL") %>% 
+  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+# Get the top 10 and bottom 10 groups by CAG diff
+four_way_df <- rbind(head(four_way_df, 10), tail(four_way_df, 10))
+# Save results
+four_way_df %>% tidy_table(table_cols) %>%
+  write.csv("four_way_effects/4_eal.csv", row.names = F)
+```
+
+```{r}
+# Ethnicity X IDACI X Prior Attainment X SEN
+# Filter data and sort by CAG diff
+four_way_df <- data %>% filter(factor == "Ethnicity X\nIDACI X\nPrior Attainment X\nSEN") %>% 
+  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+# Get the top 10 and bottom 10 groups by CAG diff
+four_way_df <- rbind(head(four_way_df, 10), tail(four_way_df, 10))
+# Save results
+four_way_df %>% tidy_table(table_cols) %>%
+  write.csv("four_way_effects/4_sen.csv", row.names = F)
+```
+
+```{r}
+# Ethnicity X IDACI X Prior Attainment X SEN
+# Filter data and sort by CAG diff
+four_way_df <- data %>% filter(factor == "Ethnicity X\nIDACI X\nPrior Attainment X\nGender") %>% 
+  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+# Get the top 10 and bottom 10 groups by CAG diff
+four_way_df <- rbind(head(four_way_df, 10), tail(four_way_df, 10))
+# Save results
+four_way_df %>% tidy_table(table_cols) %>%
+  write.csv("four_way_effects/4_gender.csv", row.names = F)
+```
+
+
+```{r}
+# Ethnicity X IDACI X Prior Attainment X FSM
+# Filter data and sort by CAG diff
+four_way_df <- data %>% filter(factor == "Ethnicity X\nIDACI X\nPrior Attainment X\nFSM") %>% 
+  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+# Get the top 10 and bottom 10 groups by CAG diff
+four_way_df <- rbind(head(four_way_df, 10), tail(four_way_df, 10))
+# Save results
+four_way_df %>% tidy_table(table_cols) %>%
+  write.csv("four_way_effects/4_fsm.csv", row.names = F)
+```
+
+
 
