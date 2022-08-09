@@ -11,7 +11,7 @@ output: html_document
 # Load packages
 packages <- c("tidyverse", "ggplot2", 
               "ggthemes", "stringi",
-              "tools")
+              "tools", "glue")
 suppressMessages(invisible(lapply(packages, library, character.only=TRUE)))
 
 # Suppress summarise info
@@ -169,29 +169,60 @@ calc_range_interaction(data, n_interactions = 2)
 ```
 
 ```{r}
-data %>% filter(interactions == 2) %>% select(factor) %>% unique()
-```
+two_way_vars <- calc_range_interaction(data, n_interactions = 2) %>% select(factor)
+two_way_vars <- two_way_vars$factor
+two_way_vars %>% str_to_lower() %>% str_replace_all(" x\n", "_")
 
+two_way_vars
+```
 
 ```{r}
-# Get all the required two-way variables
-two_way_vars <- data %>% filter(grepl("X\n", factor)) %>% 
-  filter(interactions == 1) %>% select(factor) %>% unique()
-
-two_way_vars <- c("Ethnicity X\nIDACI", "Ethnicity X\nPrior Attainment",
-                  "IDACI X\nPrior Attainment", "EAL X\nIDACI")
-two_way_vars <- two_way_vars %>% sort()
-
-# Go through main results, sorting by cag_diff within each group
-two_df <- data.frame()
+# Rework factor value into two cols for plotting
+two_data <- data %>% filter(interactions == 2) %>%
+  separate(factor_value, c("var1", "var2"),
+           remove = FALSE,
+           sep = " X ")
+# Iterate through each two-way interaction
 for (factor_var in two_way_vars){
-  subdf <- data %>% filter(factor == factor_var)
-  subdf <- subdf[order(subdf$cag_diff, decreasing = TRUE), ]
-  two_df <- rbind(two_df, subdf)
+  # Filter to current two-way interaction
+  subdf <- two_data %>% filter(factor == factor_var)
+  # Order on Var 1
+  subdf <- subdf[order(subdf$var1), ]
+  # Get neatened var name
+  clean_name <- factor_var %>% str_replace("\n", " ")
+  # Get var1 neatened name
+  legend_name <- factor_var %>% str_split(" X\n") %>% unlist()
+  legend_name <- legend_name[2]
+
+  # Plot main effects
+  plot <- ggplot(data = subdf, mapping = aes(x = cag_diff,
+                                             y = var1,
+                                             color = var2,
+                                             shape = var2)) +
+    # Add points
+    geom_point(size = 3) + 
+    # Add titles and labels
+    ggtitle(glue("ATE | ", clean_name)) +
+    xlab("Average Treatment Effect (GCSE Grade Points)") +
+    ylab(clean_name) +
+    # Retitle legend
+    labs(color=legend_name) + labs(shape=legend_name) +
+    # Adjust theme
+    my_theme + theme(plot.title = element_text(hjust = 0.4)) +
+    guides(colour=guide_legend(nrow=2), shape=guide_legend(nrow=2))
+  # Save plot
+  # Get save name
+  save_name <- factor_var %>% str_to_lower() %>% str_replace_all(" x\n", "_")
+  plot_save_name <- glue("two_way_effects/graphs/", save_name, ".png")
+  ggsave(plot_save_name, plot)
+  
+  # Also save table
+  subdf %>% tidy_table(table_cols) %>%
+  write.csv(glue("two_way_effects/tables/", save_name, ".csv"), row.names = F)
 }
-two_df
 
 ```
+
 
 # Three-Way Interactions
 
@@ -199,6 +230,67 @@ two_df
 # Find the 3 way interactions that have greatest differences between max and min
 calc_range_interaction(data, n_interactions = 3)
 ```
+```{r}
+# Ethnicity X IDACI X Prior Attainment
+# Filter data and sort by CAG diff
+three_way_df <- data %>% filter(factor == "Ethnicity X\nIDACI X\nPrior Attainment") %>% 
+  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+# Get the top 10 and bottom 10 groups by CAG diff
+three_way_df <- rbind(head(three_way_df, 10), tail(three_way_df, 10))
+# Save results
+three_way_df %>% tidy_table(table_cols) %>%
+  write.csv("three_way_effects/ethnic_idaci_prior.csv", row.names = F)
+```
+
+```{r}
+# Ethnicity X FSM X Prior Attainment
+# Filter data and sort by CAG diff
+three_way_df <- data %>% filter(factor == "Ethnicity X\nFSM X\nPrior Attainment") %>% 
+  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+# Get the top 10 and bottom 10 groups by CAG diff
+three_way_df <- rbind(head(three_way_df, 10), tail(three_way_df, 10))
+# Save results
+three_way_df %>% tidy_table(table_cols) %>%
+  write.csv("three_way_effects/ethnic_fsm_prior.csv", row.names = F)
+```
+
+
+```{r}
+# Ethnicity X IDACI X SEN
+# Filter data and sort by CAG diff
+three_way_df <- data %>% filter(factor == "Ethnicity X\nIDACI X\nSEN") %>% 
+  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+# Get the top 10 and bottom 10 groups by CAG diff
+three_way_df <- rbind(head(three_way_df, 10), tail(three_way_df, 10))
+# Save results
+three_way_df %>% tidy_table(table_cols) %>%
+  write.csv("three_way_effects/ethnic_idaci_sen.csv", row.names = F)
+```
+
+```{r}
+# Gender X IDACI X Prior Attainment
+# Filter data and sort by CAG diff
+three_way_df <- data %>% filter(factor == "Gender X\nIDACI X\nPrior Attainment") %>% 
+  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+# Get the top 10 and bottom 10 groups by CAG diff
+three_way_df <- rbind(head(three_way_df, 10), tail(three_way_df, 10))
+# Save results
+three_way_df %>% tidy_table(table_cols) %>%
+  write.csv("three_way_effects/gender_idaci_prior.csv", row.names = F)
+```
+
+```{r}
+# A FIFTH ONE PERHAPS
+# Filter data and sort by CAG diff
+three_way_df <- data %>% filter(factor == "Gender X\nIDACI X\nPrior Attainment") %>% 
+  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+# Get the top 10 and bottom 10 groups by CAG diff
+three_way_df <- rbind(head(three_way_df, 10), tail(three_way_df, 10))
+# Save results
+three_way_df %>% tidy_table(table_cols) %>%
+  write.csv("three_way_effects/gender_idaci_prior.csv", row.names = F)
+```
+
 
 # Four-Way Interactions
 
