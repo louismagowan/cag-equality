@@ -11,7 +11,7 @@ output: html_document
 # Load packages
 packages <- c("tidyverse", "ggplot2", 
               "ggthemes", "stringi",
-              "tools", "glue")
+              "tools", "glue", "rlang")
 suppressMessages(invisible(lapply(packages, library, character.only=TRUE)))
 
 # Suppress summarise info
@@ -169,14 +169,10 @@ calc_range_interaction(data, n_interactions = 2)
 ```
 
 ```{r}
+# Get list of two-way vars
 two_way_vars <- calc_range_interaction(data, n_interactions = 2) %>% select(factor)
 two_way_vars <- two_way_vars$factor
-two_way_vars %>% str_to_lower() %>% str_replace_all(" x\n", "_")
 
-two_way_vars
-```
-
-```{r}
 # Rework factor value into two cols for plotting
 two_data <- data %>% filter(interactions == 2) %>%
   separate(factor_value, c("var1", "var2"),
@@ -230,6 +226,101 @@ for (factor_var in two_way_vars){
 # Find the 3 way interactions that have greatest differences between max and min
 calc_range_interaction(data, n_interactions = 3)
 ```
+
+
+```{r}
+# Get list of three-way vars
+three_way_vars <- calc_range_interaction(data, n_interactions = 3) %>% select(factor)
+three_way_vars <- three_way_vars$factor
+
+# Rework factor value into two cols for plotting
+three_data <- data %>% filter(interactions == 3) %>%
+  separate(factor_value, c("var1", "var2", "var3"),
+           remove = FALSE,
+           sep = " X ")
+# Dynamically plot facet using the var with least features
+col_list <- c("var1", "var2", "var3")
+
+# Iterate through each two-way interaction
+for (factor_var in three_way_vars){
+  # Filter to current two-way interaction
+  subdf <- three_data %>% filter(factor == factor_var)
+  # Order on Var 1
+  subdf <- subdf[order(subdf$var1), ]
+  # Get neatened var name
+  clean_name <- factor_var %>% str_replace_all("\n", " ")
+
+  # Find the column with the least features
+  facet_col <- lapply(subdf[c("var1", "var2", "var3")],
+                      function(x) c((length(unique(x))))) %>% 
+    which.min() %>% names()
+  # Get the non-facet cols
+  non_facet_cols <- col_list[!(col_list %in% facet_col)]
+  # Get neatened name for legend
+  legend_name <- factor_var %>% str_split(" X\n") %>% unlist()
+  legend_name <- legend_name[!(col_list %in% facet_col)][2]
+  # Plot main effects
+  plot <- ggplot(data = subdf, mapping = aes(x = cag_diff,
+                                             y = !!sym(non_facet_cols[1]),
+                                             color = !!sym(non_facet_cols[2]),
+                                             shape = !!sym(non_facet_cols[2]))) +
+  # Add points
+  geom_point(size = 3) +
+  facet_wrap(sym(facet_col)) +
+    # Add titles and labels
+    ggtitle(glue("ATE | ", clean_name)) +
+    xlab("Average Treatment Effect (GCSE Grade Points)") +
+    ylab(clean_name) +
+    # Retitle legend
+    labs(color=legend_name) + labs(shape=legend_name) +
+    # Adjust theme
+    my_theme + theme(plot.title = element_text(hjust = 0.4)) +
+    guides(colour=guide_legend(nrow=2), shape=guide_legend(nrow=2)) +
+    theme(strip.background = element_rect(color = "black",
+                                          fill="grey"),
+          panel.border = element_rect(color = "black", fill = NA, size = 1))+
+    
+    theme(strip.text = element_text(colour = 'white'))
+
+  # Save plot
+  # Get save name
+  save_name <- factor_var %>% str_to_lower() %>% str_replace_all(" x\n", "_")
+  plot_save_name <- glue("three_way_effects/graphs/", save_name, ".png")
+  ggsave(plot_save_name, plot)
+
+  # Also save table
+  subdf %>% tidy_table(table_cols) %>%
+  write.csv(glue("three_way_effects/tables/", save_name, ".csv"), row.names = F)
+}
+```
+
+```{r}
+plot
+
+```
+
+
+```{r}
+# Plot main effects
+plot <- ggplot(data = subdf, mapping = aes(x = cag_diff,
+                                           y = !!sym(non_facet_cols[1]),
+                                             color = !!sym(non_facet_cols[2]),
+                                             shape = !!sym(non_facet_cols[2]))) +
+  # Add points
+  geom_point(size = 3) +
+  facet_wrap(sym(facet_col))
+
+plot
+facet_col
+
+subdf
+
+sym(facet_col)
+
+# library()
+```
+
+
 ```{r}
 # Ethnicity X IDACI X Prior Attainment
 # Filter data and sort by CAG diff
