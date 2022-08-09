@@ -125,7 +125,7 @@ plot <- ggplot(data = main_df, mapping = aes(x = cag_diff,
   geom_point(size = 3) + 
   # Add titles and labels
   ggtitle("Average Treatment Effects") +
-  xlab("Average Treatment Effect") + ylab("Category Value") +
+  xlab("Average Treatment Effect (GCSE Grade Points)") + ylab("Category Value") +
   # Retitle legend
   labs(color='Category') + labs(shape='Category') +
   # Adjust theme
@@ -165,7 +165,11 @@ main_df %>% tidy_table(table_cols) %>%
 
 ```{r}
 # Find the 2 way interactions that have greatest differences between max and min
-calc_range_interaction(data, n_interactions = 2) %>% head(10)
+calc_range_interaction(data, n_interactions = 2)
+```
+
+```{r}
+data %>% filter(interactions == 2) %>% select(factor) %>% unique()
 ```
 
 
