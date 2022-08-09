@@ -5,6 +5,10 @@
 *.ipynb_checkpoints
 *__pycache__
 
+# Files
+*.csv
+*.png
+
 
 # History files
 .Rhistory
