@@ -1,0 +1,107 @@
+---
+title: "results_analysis"
+author: "Louis Magowan"
+date: '2022-08-08'
+output: html_document
+---
+
+# Imports and Setup
+
+```{r}
+# Load packages
+packages <- c("tidyverse", "ggplot2", 
+              "ggthemes", "stringi")
+suppressMessages(invisible(lapply(packages, library, character.only=TRUE)))
+
+# Suppress summarise info
+options(dplyr.summarise.inform = FALSE)
+```
+
+```{r}
+# Read in data
+data <- read.csv("predicted_diffs-ols.csv")
+# Tidy up factor labels for plotting
+old_factor_labels <- c('Idaci', 'Eal', 'Fsm', 'Sen', "Centretypedesc")
+new_factor_labels <- c('IDACI', 'EAL', 'FSM', "SEN", "Centre Type")
+data$factor <- stri_replace_all_regex(data$factor,
+                                      pattern = c('_', "X"),
+                                      replacement = c(" ", " X\n"),
+                                      vectorize=FALSE) %>%
+  str_to_title() %>% 
+  stri_replace_all_regex(pattern = old_factor_labels,
+                         replacement = new_factor_labels,
+                         vectorize=FALSE)
+# Tidying up factor value labels for plotting
+data$factor_value <- data$factor_value %>% toTitleCase()
+```
+
+
+```{r}
+# Save theme
+my_theme <- theme_economist() +
+  theme(axis.text.x = element_text(vjust = 2),
+          axis.text.y = element_text(hjust = 1.2),
+          axis.title = element_text(face = "bold"),
+          plot.title = element_text(vjust = 3, hjust = 0.5),
+          legend.title = element_text(face = "bold"),
+          legend.text = element_text(size = 10),
+          legend.position = "bottom",
+          legend.background = element_rect(fill = "white"))
+
+# Get columns needed for output
+table_cols <- c("factor", "factor_value", "cag_diff",
+                "centreassessmentgrade", "predictions",
+                "welch.p_val")
+```
+
+# Main Effects
+```{r}
+# Filter to only the relevant main effects
+main_factors <- c("IDACI Quantile", "FSM", "EAL",
+                  "Ethnicity", "Gender", "SEN") %>% sort()
+main_effects <- data %>% filter(factor %in% main_factors)
+# Go through main results, sorting by cag_diff within each group
+main_df <- data.frame()
+for (factor_var in main_factors){
+  subdf <- main_effects %>% filter(factor == factor_var)
+  subdf <- subdf[order(subdf$cag_diff, decreasing = TRUE), ]
+  main_df <- rbind(main_df, subdf)
+}
+# Make factor values a factor, so they are ordered in plot
+main_df$factor_value  <- factor(main_df$factor_value,
+                                     levels = (main_df$factor_value))
+# Plot main effects
+plot <- ggplot(data = main_df, mapping = aes(x = cag_diff,
+                                               y = factor_value,
+                                               color = factor,
+                                               shape = factor)) +
+    geom_point(size = 3) + 
+    ggtitle("Average Treatment Effects | Main Effects") + 
+  xlab("Average Treatment Effect") + ylab("Category Value") +
+  labs(color='Category') + labs(shape='Category') +
+  my_theme
+
+# Get plot build in order to access the colours used
+plot_build <- ggplot_build(plot)
+# Add the plot colours to the yticks
+plot <- plot + theme(axis.text.y = element_text(color = plot_build$data[[1]]$colour))
+# Save plot
+ggsave("main_effects/main_effects.png", plot)
+# Tidy up results for table format
+# Write <0.001 for pvals, else round to 3dp
+main_df$welch.p_val <- ifelse(main_df$welch.p_val < 0.001, 
+                              "<0.001", 
+                              round(main_df$welch.p_val, 3))
+# Save number results as table in same order as graph
+main_df[order(nrow(main_df):1), ] %>% select(table_cols) %>% 
+  # Round the remaining columns
+  mutate_if(is.numeric, round, 3) %>% 
+  write.csv("main_effects/main_table.csv",
+            row.names = FALSE)
+plot
+```
+
+```{r}
+main_df
+```
+
