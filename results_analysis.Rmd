@@ -295,33 +295,6 @@ for (factor_var in three_way_vars){
 ```
 
 ```{r}
-plot
-
-```
-
-
-```{r}
-# Plot main effects
-plot <- ggplot(data = subdf, mapping = aes(x = cag_diff,
-                                           y = !!sym(non_facet_cols[1]),
-                                             color = !!sym(non_facet_cols[2]),
-                                             shape = !!sym(non_facet_cols[2]))) +
-  # Add points
-  geom_point(size = 3) +
-  facet_wrap(sym(facet_col))
-
-plot
-facet_col
-
-subdf
-
-sym(facet_col)
-
-# library()
-```
-
-
-```{r}
 # Ethnicity X IDACI X Prior Attainment
 # Filter data and sort by CAG diff
 three_way_df <- data %>% filter(factor == "Ethnicity X\nIDACI X\nPrior Attainment") %>% 
