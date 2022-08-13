@@ -20,7 +20,7 @@ options(dplyr.summarise.inform = FALSE)
 
 ```{r}
 # Read in data
-data <- read.csv("predicted_diffs-processed.csv")
+data <- read.csv("data/predicted_diffs-processed.csv")
 # Tidy up factor labels for plotting
 old_factor_labels <- c('Attainment Quantile', 'Eal', 'Fsm', 'Sen',
                        "Centretypedesc", "Idaci Quantile")
@@ -57,6 +57,13 @@ my_theme <- theme_economist() +
 table_cols <- c("factor", "factor_value", "cag_diff",
                 "centreassessmentgrade", "predictions",
                 "welch.p_val")
+
+# Get factor levels to reorder
+prior_attainment_levels <- c("Very Low", "Low", "Medium",
+                             "High", "Very High")
+idaci_levels <- c("Very High IDACI", "High IDACI",
+                  "Medium IDACI", "Low IDACI",
+                  "Very Low IDACI")
 ```
 
 
@@ -124,12 +131,12 @@ plot <- ggplot(data = main_df, mapping = aes(x = cag_diff,
   # Add points
   geom_point(size = 3) + 
   # Add titles and labels
-  ggtitle("Average Treatment Effects") +
-  xlab("Average Treatment Effect (GCSE Grade Points)") + ylab("Category Value") +
+  ggtitle("Conditional Avg. Treatment Effects") +
+  xlab("CATE (GCSE Grade Points)") + ylab("Category Value") +
   # Retitle legend
   labs(color='Category') + labs(shape='Category') +
   # Adjust theme
-  my_theme
+  my_theme + theme(axis.text.y = element_text(hjust = 1.1))
 
 # Get plot build in order to access the colours used
 plot_build <- ggplot_build(plot)
@@ -184,6 +191,26 @@ for (factor_var in two_way_vars){
   subdf <- two_data %>% filter(factor == factor_var)
   # Order on Var 1
   subdf <- subdf[order(subdf$var1), ]
+  # Check if prior attainment is in var1  and reorder if true
+  if (any(str_detect(subdf$var1, "Low") == 1) &&
+      (any(str_detect(subdf$var1, "IDACI") == 0))){
+    subdf$var1 <- subdf$var1 %>% factor(levels = prior_attainment_levels)
+  }
+  # Check if prior attainment is in var2  and reorder if true
+  if (any(str_detect(subdf$var2, "Low") == 1) &&
+      (any(str_detect(subdf$var2, "IDACI") == 0))){
+    subdf$var2 <- subdf$var2 %>% factor(levels = prior_attainment_levels)
+  }
+    # Check if ICADI is in var1  and reorder if true
+  if (any(str_detect(subdf$var1, "Low") == 1) &&
+      (any(str_detect(subdf$var1, "IDACI") == 1))){
+    subdf$var1 <- subdf$var1 %>% factor(levels = idaci_levels)
+  }
+  # Check if IDACI is in var2  and reorder if true
+  if (any(str_detect(subdf$var2, "Low") == 1) &&
+      (any(str_detect(subdf$var2, "IDACI") == 1))){
+    subdf$var2 <- subdf$var2 %>% factor(levels = idaci_levels)
+  }
   # Get neatened var name
   clean_name <- factor_var %>% str_replace("\n", " ")
   # Get var1 neatened name
@@ -198,8 +225,8 @@ for (factor_var in two_way_vars){
     # Add points
     geom_point(size = 3) + 
     # Add titles and labels
-    ggtitle(glue("ATE | ", clean_name)) +
-    xlab("Average Treatment Effect (GCSE Grade Points)") +
+    ggtitle(glue("CATE | ", clean_name)) +
+    xlab("Conditional Avg. Treatment Effect (GCSE Grade Points)") +
     ylab(clean_name) +
     # Retitle legend
     labs(color=legend_name) + labs(shape=legend_name) +
@@ -215,10 +242,10 @@ for (factor_var in two_way_vars){
   # Also save table
   subdf %>% tidy_table(table_cols) %>%
   write.csv(glue("two_way_effects/tables/", save_name, ".csv"), row.names = F)
+  
+  # break
 }
-
 ```
-
 
 # Three-Way Interactions
 
@@ -247,6 +274,36 @@ for (factor_var in three_way_vars){
   subdf <- three_data %>% filter(factor == factor_var)
   # Order on Var 1
   subdf <- subdf[order(subdf$var1), ]
+  # Check if prior attainment is in var1  and reorder if true
+  if (any(str_detect(subdf$var1, "Low") == 1) &&
+      (any(str_detect(subdf$var1, "IDACI") == 0))){
+    subdf$var1 <- subdf$var1 %>% factor(levels = prior_attainment_levels)
+  }
+  # Check if prior attainment is in var2  and reorder if true
+  if (any(str_detect(subdf$var2, "Low") == 1) &&
+      (any(str_detect(subdf$var2, "IDACI") == 0))){
+    subdf$var2 <- subdf$var2 %>% factor(levels = prior_attainment_levels)
+  }
+  # Check if prior attainment is in var3  and reorder if true
+  if (any(str_detect(subdf$var3, "Low") == 1) &&
+      (any(str_detect(subdf$var3, "IDACI") == 0))){
+    subdf$var3 <- subdf$var3 %>% factor(levels = prior_attainment_levels)
+  }
+    # Check if ICADI is in var1  and reorder if true
+  if (any(str_detect(subdf$var1, "Low") == 1) &&
+      (any(str_detect(subdf$var1, "IDACI") == 1))){
+    subdf$var1 <- subdf$var1 %>% factor(levels = idaci_levels)
+  }
+  # Check if IDACI is in var2  and reorder if true
+  if (any(str_detect(subdf$var2, "Low") == 1) &&
+      (any(str_detect(subdf$var2, "IDACI") == 1))){
+    subdf$var2 <- subdf$var2 %>% factor(levels = idaci_levels)
+  }
+  # Check if IDACI is in var3  and reorder if true
+  if (any(str_detect(subdf$var3, "Low") == 1) &&
+      (any(str_detect(subdf$var3, "IDACI") == 1))){
+    subdf$var3 <- subdf$var3 %>% factor(levels = idaci_levels)
+  }
   # Get neatened var name
   clean_name <- factor_var %>% str_replace_all("\n", " ")
 
@@ -268,8 +325,8 @@ for (factor_var in three_way_vars){
   geom_point(size = 3) +
   facet_wrap(sym(facet_col)) +
     # Add titles and labels
-    ggtitle(glue("ATE | ", clean_name)) +
-    xlab("Average Treatment Effect (GCSE Grade Points)") +
+    ggtitle(glue("CATE | ", clean_name)) +
+    xlab("Conditional Avg. Treatment Effect (GCSE Grade Points)") +
     ylab(clean_name) +
     # Retitle legend
     labs(color=legend_name) + labs(shape=legend_name) +
