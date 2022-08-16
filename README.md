@@ -140,7 +140,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [Medium Profile](https://medium.com/@louismagowan42) - louismagowan42@gmail.com
+Louis Magowan - [Medium Profile](https://medium.com/@louismagowan42) - louismagowan42@gmail.com
 
 Project Link: [https://github.com/louismagowan/cag-equality](https://github.com/louismagowan/cag-equality)
 
