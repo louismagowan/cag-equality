@@ -355,24 +355,26 @@ for (factor_var in three_way_vars){
 # Ethnicity X IDACI X Prior Attainment
 # Filter data and sort by CAG diff
 three_way_df <- data %>% filter(factor == "Ethnicity X\nIDACI X\nPrior Attainment") %>% 
-  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+  arrange(cag_diff) 
+# %>% filter(welch.p_val <= 0.05)
 # Get the top 10 and bottom 10 groups by CAG diff
 three_way_df <- rbind(head(three_way_df, 10), tail(three_way_df, 10))
 # Save results
 three_way_df %>% tidy_table(table_cols) %>%
-  write.csv("three_way_effects/ethnic_idaci_prior.csv", row.names = F)
+  write.csv("three_way_effects/tables/custom_ethnic_idaci_prior.csv", row.names = F)
 ```
 
 ```{r}
 # Ethnicity X FSM X Prior Attainment
 # Filter data and sort by CAG diff
 three_way_df <- data %>% filter(factor == "Ethnicity X\nFSM X\nPrior Attainment") %>% 
-  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+  arrange(cag_diff) 
+# %>% filter(welch.p_val <= 0.05)
 # Get the top 10 and bottom 10 groups by CAG diff
 three_way_df <- rbind(head(three_way_df, 10), tail(three_way_df, 10))
 # Save results
 three_way_df %>% tidy_table(table_cols) %>%
-  write.csv("three_way_effects/ethnic_fsm_prior.csv", row.names = F)
+  write.csv("three_way_effects/tables/custom_ethnic_fsm_prior.csv", row.names = F)
 ```
 
 
@@ -380,37 +382,42 @@ three_way_df %>% tidy_table(table_cols) %>%
 # Ethnicity X IDACI X SEN
 # Filter data and sort by CAG diff
 three_way_df <- data %>% filter(factor == "Ethnicity X\nIDACI X\nSEN") %>% 
-  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+  arrange(cag_diff) 
+# %>% filter(welch.p_val <= 0.05)
 # Get the top 10 and bottom 10 groups by CAG diff
 three_way_df <- rbind(head(three_way_df, 10), tail(three_way_df, 10))
 # Save results
 three_way_df %>% tidy_table(table_cols) %>%
-  write.csv("three_way_effects/ethnic_idaci_sen.csv", row.names = F)
+  write.csv("three_way_effects/tables/custom_ethnic_idaci_sen.csv", row.names = F)
 ```
 
 ```{r}
 # Gender X IDACI X Prior Attainment
 # Filter data and sort by CAG diff
 three_way_df <- data %>% filter(factor == "Gender X\nIDACI X\nPrior Attainment") %>% 
-  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+  arrange(cag_diff) 
+# %>% filter(welch.p_val <= 0.05)
 # Get the top 10 and bottom 10 groups by CAG diff
 three_way_df <- rbind(head(three_way_df, 10), tail(three_way_df, 10))
 # Save results
 three_way_df %>% tidy_table(table_cols) %>%
-  write.csv("three_way_effects/gender_idaci_prior.csv", row.names = F)
+  write.csv("three_way_effects/tables/custom_gender_idaci_prior.csv", row.names = F)
 ```
 
 ```{r}
-# A FIFTH ONE PERHAPS
+# Gender X Ethnicity  IDACI
 # Filter data and sort by CAG diff
-three_way_df <- data %>% filter(factor == "Gender X\nIDACI X\nPrior Attainment") %>% 
-  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+three_way_df <- data %>% filter(factor == "Gender X\nEthnicity X\nIDACI") %>% 
+  arrange(cag_diff) 
+# %>% filter(welch.p_val <= 0.05)
 # Get the top 10 and bottom 10 groups by CAG diff
 three_way_df <- rbind(head(three_way_df, 10), tail(three_way_df, 10))
 # Save results
 three_way_df %>% tidy_table(table_cols) %>%
-  write.csv("three_way_effects/gender_idaci_prior.csv", row.names = F)
+  write.csv("three_way_effects/tables/custom_gender_idaci_ethnic.csv", row.names = F)
 ```
+
+
 
 
 # Four-Way Interactions
@@ -424,36 +431,39 @@ calc_range_interaction(data, n_interactions = 4)
 # Ethnicity X IDACI X Prior Attainment X EAL
 # Filter data and sort by CAG diff
 four_way_df <- data %>% filter(factor == "Ethnicity X\nIDACI X\nPrior Attainment X\nEAL") %>% 
-  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+  arrange(cag_diff) 
+# %>% filter(welch.p_val <= 0.05)
 # Get the top 10 and bottom 10 groups by CAG diff
 four_way_df <- rbind(head(four_way_df, 10), tail(four_way_df, 10))
 # Save results
 four_way_df %>% tidy_table(table_cols) %>%
-  write.csv("four_way_effects/4_eal.csv", row.names = F)
+  write.csv("four_way_effects/tables/custom_4_eal.csv", row.names = F)
 ```
 
 ```{r}
 # Ethnicity X IDACI X Prior Attainment X SEN
 # Filter data and sort by CAG diff
 four_way_df <- data %>% filter(factor == "Ethnicity X\nIDACI X\nPrior Attainment X\nSEN") %>% 
-  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+  arrange(cag_diff) 
+# %>% filter(welch.p_val <= 0.05)
 # Get the top 10 and bottom 10 groups by CAG diff
 four_way_df <- rbind(head(four_way_df, 10), tail(four_way_df, 10))
 # Save results
 four_way_df %>% tidy_table(table_cols) %>%
-  write.csv("four_way_effects/4_sen.csv", row.names = F)
+  write.csv("four_way_effects/tables/custom_4_sen.csv", row.names = F)
 ```
 
 ```{r}
-# Ethnicity X IDACI X Prior Attainment X SEN
+# Ethnicity X IDACI X Prior Attainment X Gender
 # Filter data and sort by CAG diff
 four_way_df <- data %>% filter(factor == "Ethnicity X\nIDACI X\nPrior Attainment X\nGender") %>% 
-  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+  arrange(cag_diff)
+# %>% filter(welch.p_val <= 0.05)
 # Get the top 10 and bottom 10 groups by CAG diff
 four_way_df <- rbind(head(four_way_df, 10), tail(four_way_df, 10))
 # Save results
 four_way_df %>% tidy_table(table_cols) %>%
-  write.csv("four_way_effects/4_gender.csv", row.names = F)
+  write.csv("four_way_effects/tables/custom_4_gender.csv", row.names = F)
 ```
 
 
@@ -461,12 +471,13 @@ four_way_df %>% tidy_table(table_cols) %>%
 # Ethnicity X IDACI X Prior Attainment X FSM
 # Filter data and sort by CAG diff
 four_way_df <- data %>% filter(factor == "Ethnicity X\nIDACI X\nPrior Attainment X\nFSM") %>% 
-  arrange(cag_diff) %>% filter(welch.p_val <= 0.05)
+  arrange(cag_diff) 
+# %>% filter(welch.p_val <= 0.05)
 # Get the top 10 and bottom 10 groups by CAG diff
 four_way_df <- rbind(head(four_way_df, 10), tail(four_way_df, 10))
 # Save results
 four_way_df %>% tidy_table(table_cols) %>%
-  write.csv("four_way_effects/4_fsm.csv", row.names = F)
+  write.csv("four_way_effects/tables/custom_4_fsm.csv", row.names = F)
 ```
 
 
