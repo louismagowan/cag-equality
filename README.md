@@ -25,37 +25,14 @@
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 
-<h3 align="center">WORK IN PROGRESS!!!!!</h3>
+<h3 align="center">Centre Assessment Grades in 2020: A Natural Experiment for Investigating Bias in Teacher Judgements</h3>
 
   <p align="center">
-    WORK IN PROGRESS!!!!!
+    Code used for capstone project/thesis during MSc in Applied Social Data Science at LSE.
   </p>
 </div>
 
 
-
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
 
 
 
@@ -68,50 +45,10 @@ Here's a blank template to get started: To avoid retyping too much info. Do a se
 
 
 
-### Built With
+## Built With
 
-* [Next.js](https://nextjs.org/)
-* [React.js](https://reactjs.org/)
-* [Vue.js](https://vuejs.org/)
-* [Angular](https://angular.io/)
-* [Svelte](https://svelte.dev/)
-* [Laravel](https://laravel.com)
-* [Bootstrap](https://getbootstrap.com)
-* [JQuery](https://jquery.com)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- GETTING STARTED -->
-## Getting Started
-
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
-
-### Prerequisites
-
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
-
-### Installation
-
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/github_username/repo_name.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
+* Python: Scikit-Learn, Statsmodels, Scipy, Tensorflow, Keras, LightGBM, Optuna, SHAP, Matplotlib and Seaborn.
+* R: Tidyverse, ggplot2 and rlang
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -119,7 +56,11 @@ This is an example of how to list things you need to use the software and how to
 
 
 
+## Prerequisites
 
+In order to work with the same data I did, you will need to apply to become an accredited researcher with the ONS (Office for National Statistics). Then you'll need to submit a project application to work with the [GRADE](https://www.gov.uk/government/publications/grading-and-admissions-data-for-england-grade-framework) dataset. This is a lengthy and involved process, best to allow ~6 months before you'd be able to get started working with the data.
+
+If you do gain access to the dataset, you will also need to request a custom virtual environment to be created for you within the Secure Research Service. Then you'll also need to request whatever non-standard packages you want to be installed there, as you are not able to ingest code or install packages yourself. I requested Keras, Tensorflow, LightGBM, Optuna and Shap to be installed.
 
 
 
