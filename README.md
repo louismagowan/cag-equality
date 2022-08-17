@@ -51,9 +51,9 @@ Check out the dashboard of results here.
 
 ## Project Contents
 
-* <b>cag_code.py:<b\> Python file that contains all the code used to analyse data within the Secure Research Service (SRS). The limitations of working in the SRS (due to the sensitivity of the data) meant that code was exported all one file and so is less modular than it could have been. It also meant that any output had to be removed (it was originally in Notebook form).
-* <b>results_analysis.Rmd:<b\> RMarkdown file used to produce the conditional average treatment effect graphs for the project.
-* <b>prep_for_visualisations.ipynb:<b\> Jupyter Notebook for reformatting and reshaping the CAG data released from the SRS into data that can be more easily uploaded to BigQuery and used in the Data Studio dashboard for the project.
+* <b>cag_code.py:</b> Python file that contains all the code used to analyse data within the Secure Research Service (SRS). The limitations of working in the SRS (due to the sensitivity of the data) meant that code was exported all one file and so is less modular than it could have been. It also meant that any output had to be removed (it was originally in Notebook form).
+* <b>results_analysis.Rmd:</b> RMarkdown file used to produce the conditional average treatment effect graphs for the project.
+* <b>prep_for_visualisations.ipynb:</b> Jupyter Notebook for reformatting and reshaping the CAG data released from the SRS into data that can be more easily uploaded to BigQuery and used in the Data Studio dashboard for the project.
 
 ## Built With
 
