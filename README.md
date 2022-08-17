@@ -45,13 +45,15 @@ A variety of machine learning models (<b>neural networks, support vector regress
 
 No evidence of absolute negative bias against students of any demographic or socio-economic characteristic was found, with all groups of students having received higher CAGs than the grades they were likely to have received had they sat their examinations. Some evidence for relative bias was found, with consistent, but insubstantial differences being observed in the treatment effects of certain groups. However, when higher-order interactions of student characteristics were considered, these differences became more substantial. Intersectional perspectives which emphasise the importance of interactions and sub-group differences should be used more widely within quantitative educational equalities research.
 
-Check out the [dashboard of results here](https://datastudio.google.com/reporting/7c49d7ca-ae1c-43cf-a8f7-8e70d969fbad)
+  <a align="center" href="https://datastudio.google.com/reporting/7c49d7ca-ae1c-43cf-a8f7-8e70d969fbad">
+Check out the dashboard of results here.
+  </a>
 
 ## Project Contents
 
-* <b>cag_code.py:<b\> Python file that contains all the code used to analyse data within the Secure Research Service (SRS). The limitations of working in the SRS (due to the sensitivity of the data) meant that code was exported all one file and so is less modular than it could have been. It also meant that any output had to be removed (it was originally in Notebook form).
-* <b>results_analysis.Rmd:<b\> RMarkdown file used to produce the conditional average treatment effect graphs for the project.
-* <b>prep_for_visualisations.ipynb:<b\> Jupyter Notebook for reformatting and reshaping the CAG data released from the SRS into data that can be more easily uploaded to BigQuery and used in the Data Studio dashboard for the project.
+* <b>cag_code.py:</b> Python file that contains all the code used to analyse data within the Secure Research Service (SRS). The limitations of working in the SRS (due to the sensitivity of the data) meant that code was exported all one file and so is less modular than it could have been. It also meant that any output had to be removed (it was originally in Notebook form).
+* <b>results_analysis.Rmd:</b> RMarkdown file used to produce the conditional average treatment effect graphs for the project.
+* <b>prep_for_visualisations.ipynb:</b> Jupyter Notebook for reformatting and reshaping the CAG data released from the SRS into data that can be more easily uploaded to BigQuery and used in the Data Studio dashboard for the project.
 
 ## Built With
 
