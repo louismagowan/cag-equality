@@ -45,7 +45,9 @@ A variety of machine learning models (<b>neural networks, support vector regress
 
 No evidence of absolute negative bias against students of any demographic or socio-economic characteristic was found, with all groups of students having received higher CAGs than the grades they were likely to have received had they sat their examinations. Some evidence for relative bias was found, with consistent, but insubstantial differences being observed in the treatment effects of certain groups. However, when higher-order interactions of student characteristics were considered, these differences became more substantial. Intersectional perspectives which emphasise the importance of interactions and sub-group differences should be used more widely within quantitative educational equalities research.
 
-Check out the [dashboard of results here](https://datastudio.google.com/reporting/7c49d7ca-ae1c-43cf-a8f7-8e70d969fbad)
+  <p align="center">
+Check out the [dashboard of results here.](https://datastudio.google.com/reporting/7c49d7ca-ae1c-43cf-a8f7-8e70d969fbad)
+  </p>
 
 ## Project Contents
 
