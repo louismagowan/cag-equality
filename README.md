@@ -39,6 +39,8 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
+DISCLAIMER: This work was produced using statistical data accessed via the ONS Secure Research Service. The use of this data in this work does not imply the endorsement of the ONS in relation to the interpretation or analysis of the statistical data. This work uses research datasets which may not exactly reproduce National Statistics aggregates.
+
 The COVID-19 pandemic meant that in 2020 students in England were unable to sit their examinations and instead received predicted grades, or “centre assessment grades” (CAGs), from their teachers to allow them to progress. Using the Grading and Admissions Data for England dataset for students in 2020 and 2018-2019, this study treats the use of CAGs as a natural experiment for causally understanding how teacher judgements of academic ability may be biased according to the demographic and socio-economic characteristics of their students. 
 
 A variety of machine learning models (<b>neural networks, support vector regressions, Optuna hyperparameter-optimised LightGBM models</b>) were trained on the 2018-19 data and then used to generate predictions for what the 2020 students were likely to have received had their examinations taken place as usual. The differences between these predictions and the CAGs that students received were calculated and then averaged across students’ different characteristics, revealing what the treatment effects of the use of CAGs for different types of students were likely to have been. 
