@@ -30,16 +30,9 @@
   <p align="center">
     Code used for capstone project/thesis during MSc in Applied Social Data Science at LSE.
   </p>
-</div>
-
- <p align="center">
-    The published article for this project can be read in the [Journal of Computational Social Science](https://link.springer.com/article/10.1007/s42001-023-00206-x#article-info)
-  </p>
-</div>
 
 
-
-
+The published article for this project can be read in the [Journal of Computational Social Science](https://link.springer.com/article/10.1007/s42001-023-00206-x#article-info)
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
