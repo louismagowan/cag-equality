@@ -32,9 +32,9 @@
   </p>
 <br>
 
-
-The published article for this project can be read in the [Journal of Computational Social Science](https://link.springer.com/article/10.1007/s42001-023-00206-x#article-info)
-
+  <p align="center">
+    The published article for this project can be read in the <a href="https://link.springer.com/article/10.1007/s42001-023-00206-x#article-info"><b>Journal of Computational Social Science </b></a>
+  </p>
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
